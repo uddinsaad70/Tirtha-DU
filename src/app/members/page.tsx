@@ -1,0 +1,108 @@
+import { createClient } from "@/lib/supabase/server";
+import MembersClient, { type Member } from "./_components/MembersClient";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "সদস্যবৃন্দ",
+  description:
+    "তীর্থের বর্তমান শিক্ষার্থী, প্রাক্তন সদস্য ও স্বেচ্ছাসেবকদের তালিকা।",
+};
+
+const ITEMS_PER_PAGE = 15;
+
+export default async function MembersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    search?: string;
+    sort?: string;
+    page?: string;
+    status?: string;
+  }>;
+}) {
+  const supabase = await createClient();
+  const resolvedParams = await searchParams;
+
+  const search = resolvedParams.search || "";
+  const sort = resolvedParams.sort || "newest";
+  const status = resolvedParams.status || "all";
+  const currentPage = Number(resolvedParams.page) || 1;
+
+  const from = (currentPage - 1) * ITEMS_PER_PAGE;
+  const to = from + ITEMS_PER_PAGE - 1;
+
+  // ১. Hero Section এবং Tabs এ দেখানোর জন্য মোট পরিসংখ্যান (কোনো ফিল্টার ছাড়া)
+  const { data: allStats } = await supabase
+    .from("members")
+    .select("is_current, is_alumni, designation, blood_group");
+
+  const stats = allStats || [];
+  const totalCount = stats.length;
+  const currentCount = stats.filter((m) => m.is_current && !m.is_alumni).length;
+  const alumniCount = stats.filter((m) => m.is_alumni).length;
+  const committeeCount = stats.filter((m) => Boolean(m.designation)).length;
+  const bloodGroupCount = new Set(
+    stats.map((m) => m.blood_group).filter(Boolean),
+  ).size;
+
+  // ২. কার্ডগুলোর জন্য ডেটা ফেচিং (সার্চ, সর্ট এবং পেজিনেশন সহ)
+  let query = supabase
+    .from("members")
+    .select(
+      "id, name, designation, department, session, phone, facebook_url, photo_url, bio, committee_year, is_current, is_alumni, blood_group",
+      { count: "exact" },
+    );
+
+  // সার্চ
+  if (search) {
+    query = query.or(
+      `name.ilike.%${search}%,department.ilike.%${search}%,designation.ilike.%${search}%`,
+    );
+  }
+
+  // স্ট্যাটাস অনুযায়ী ফিল্টার
+  if (status === "current") {
+    query = query.eq("is_current", true).eq("is_alumni", false);
+  } else if (status === "alumni") {
+    query = query.eq("is_alumni", true);
+  }
+
+  // সর্টিং
+  if (sort === "oldest") {
+    query = query.order("created_at", { ascending: true });
+  } else if (sort === "session_desc") {
+    query = query.order("session", { ascending: false });
+  } else {
+    query = query.order("created_at", { ascending: false }); // default: newest
+  }
+
+  // পেজিনেশন লিমিট
+  query = query.range(from, to);
+
+  const { data, count, error } = await query;
+
+  if (error) {
+    console.error("Failed to fetch members:", error.message);
+  }
+
+  const members: Member[] = data ?? [];
+  const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 1;
+
+  // page.tsx owns zero UI strings — all text lives in MembersClient
+  return (
+    <MembersClient
+      members={members}
+      totalCount={totalCount}
+      currentCount={currentCount}
+      alumniCount={alumniCount}
+      committeeCount={committeeCount}
+      bloodGroupCount={bloodGroupCount}
+      initialSearch={search}
+      initialSort={sort}
+      initialStatus={status}
+      totalPages={totalPages}
+      currentPage={currentPage}
+    />
+  );
+}
