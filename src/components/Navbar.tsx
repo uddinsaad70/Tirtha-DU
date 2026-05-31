@@ -286,14 +286,18 @@ export default function Navbar() {
 function LanguageToggle({
   lang,
   onToggle,
+  label,
 }: {
   lang: Lang;
   onToggle: () => void;
+  label?: string;
 }) {
   return (
     <button
       onClick={onToggle}
-      aria-label={lang === "bn" ? "Switch to English" : "বাংলায় দেখুন"}
+      aria-label={
+        label || lang === "bn" ? "Switch to English" : "বাংলায় দেখুন"
+      }
       className="flex items-center bg-white/10 rounded-full p-0.5 gap-0.5"
     >
       <span

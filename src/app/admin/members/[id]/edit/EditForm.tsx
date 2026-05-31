@@ -224,6 +224,7 @@ export default function MemberEditForm({ member }: { member: any }) {
 
             <Field label={t.adminMembersEdit.fieldRole} required>
               <select
+                name="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className={inputCls}

@@ -63,9 +63,9 @@ function extractFields(formData: FormData) {
     ? rawBloodGroup
     : null;
 
-  const memberType = formData.get("member_type")?.toString() ?? "current";
-  const is_current = memberType === "current";
-  const is_alumni = memberType === "alumni";
+  const rawIsAlumni = formData.get("is_alumni")?.toString();
+  const is_alumni = rawIsAlumni === "true"; // যদি "true" হয়, তাহলে প্রাক্তন
+  const is_current = !is_alumni; // প্রাক্তন না হলে সে বর্তমান
 
   const role = formData.get("role")?.toString() ?? "general";
   const designation =

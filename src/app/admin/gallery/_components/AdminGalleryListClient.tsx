@@ -231,8 +231,9 @@ export default function AdminGalleryListClient({
                     </h3>
                     <div className="text-xs text-gray-400 mt-auto flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5" />
-                      {formatDynamicDate(album.taken_at, lang) ||
-                        t.adminGalleryList.noDate}
+                      {album.taken_at
+                        ? formatDynamicDate(album.taken_at, lang)
+                        : t.adminGalleryList.noDate}
                     </div>
                   </div>
 

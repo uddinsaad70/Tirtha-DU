@@ -72,9 +72,10 @@ export default function AboutClient({
   }, []);
 
   // হিরো সাবটাইটেলের জন্য ডাইনামিক সাল (যেমন: 19 বা ১৯)
-  const translatedYears = translateNumbers(dynamicStats.years.toString(), lang);
-
-  // ডিকশনারি থেকে আসা টেক্সটে "১৮", "18" বা "{years}" থাকলে সেটি ডাইনামিক সাল দিয়ে রিপ্লেস হবে
+  const translatedYears =
+    translateNumbers(dynamicStats.years.toString(), lang) ||
+    dynamicStats.years.toString();
+  // ডিকশনারি থেকে আসা টেক্সট ডাইনামিক সাল দিয়ে রিপ্লেস হবে
   const dynamicHeroSubtitle = t.about.heroSubtitle
     .replace("{years}", translatedYears)
     .replace("১৮", translatedYears)
