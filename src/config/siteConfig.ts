@@ -3,11 +3,11 @@
 export const siteConfig = {
   name: "তীর্থ",
   links: {
-    facebookGroup: "https://facebook.com/groups/tirthadu",
-    facebookPage: "https://facebook.com/tirthadu.page",
+    facebookGroup: "https://www.facebook.com/share/17ihGBWk93/",
+    facebookPage: "https://www.facebook.com/share/17ihGBWk93/",
   },
   contact: {
-    email: "info.tirthadu@gmail.com", // আপনার আসল ইমেইলটি এখানে দিন
+    email: "tirthodusharsha@gmail.com",
     phone: "01xxxxxxxxx",
   },
 };

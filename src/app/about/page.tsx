@@ -17,32 +17,37 @@ export default async function AboutPage() {
   const yearsOfExperience = currentYear - 2007;
 
   // ২. ডাটাবেজ থেকে সমান্তরালে (Parallel) রিয়েল ডেটা ফেচ করা
-  const [
-    { count: totalMembers },
-    { count: bloodDonors },
-    { count: currentStudents },
-  ] = await Promise.all([
-    // মোট মেম্বার সংখ্যা
-    supabase.from("members").select("*", { count: "exact", head: true }),
+  const [{ count: totalMembers }, { data: activitiesData }] = await Promise.all(
+    [
+      // মোট মেম্বার সংখ্যা (members টেবিল থেকে)
+      supabase.from("members").select("*", { count: "exact", head: true }),
 
-    // যাদের ব্লাড গ্রুপ দেওয়া আছে (রক্তদাতা)
-    supabase
-      .from("members")
-      .select("*", { count: "exact", head: true })
-      .not("blood_group", "is", null),
+      // অ্যাক্টিভিটিস টেবিল থেকে ক্যাটাগরি এবং ইমপ্যাক্ট কাউন্ট ফেচ করা
+      supabase.from("activities").select("category, impact_count"),
+    ],
+  );
 
-    // বর্তমান শিক্ষার্থী (যারা সাবেক নয়)
-    supabase
-      .from("members")
-      .select("*", { count: "exact", head: true })
-      .eq("is_alumni", false),
-  ]);
+  // ৩. ব্লাড ডোনেশন এবং একাডেমিক কেয়ারের ইমপ্যাক্ট যোগ (Sum) করা
+  let totalBloodBags = 0;
+  let totalStudentsHelped = 0;
 
+  if (activitiesData) {
+    activitiesData.forEach((activity) => {
+      // আপনার অ্যাডমিন প্যানেলের ক্যাটাগরি স্পেলিং এর সাথে মিল রেখে
+      if (activity.category === "Blood Donation") {
+        totalBloodBags += activity.impact_count || 0;
+      } else if (activity.category === "Academic Care") {
+        totalStudentsHelped += activity.impact_count || 0;
+      }
+    });
+  }
+
+  // ৪. ডাইনামিক স্ট্যাটস অবজেক্ট তৈরি করে ক্লায়েন্টে পাঠানো
   const dynamicStats = {
     years: yearsOfExperience,
     members: totalMembers ?? 0,
-    blood: bloodDonors ?? 0,
-    students: currentStudents ?? 0,
+    blood: totalBloodBags, // 👈 activities থেকে আসা ব্লাড ব্যাগের যোগফল
+    students: totalStudentsHelped, // 👈 activities থেকে আসা শিক্ষার্থীর যোগফল
   };
 
   return <AboutClient dynamicStats={dynamicStats} />;

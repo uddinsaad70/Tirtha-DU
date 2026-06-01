@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -18,13 +18,22 @@ export const metadata: Metadata = {
     "তীর্থ — ঢাকা বিশ্ববিদ্যালয়ের শিক্ষার্থীদের কল্যাণে নিবেদিত সামাজিক সংগঠন।",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#f5f3ee",
+  colorScheme: "light",
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="bn" className={hindSiliguri.variable}>
+    <html
+      lang="bn"
+      data-scroll-behavior="smooth"
+      className={hindSiliguri.variable}
+    >
       <body
         suppressHydrationWarning
         className="font-sans bg-[#f5f3ee] text-[#1a1a2e] antialiased"

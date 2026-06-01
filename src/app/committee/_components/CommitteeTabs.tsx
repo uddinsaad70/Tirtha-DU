@@ -19,6 +19,9 @@ import {
   SlidersHorizontal,
   Loader2,
   Users,
+  GraduationCap,
+  Star,
+  Droplet,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -95,6 +98,150 @@ function Avatar({
 
 // ─── Member Detail Modal ──────────────────────────────────────────────────────
 
+// function MemberModal({
+//   member,
+//   onClose,
+// }: {
+//   member: CommitteeMember;
+//   onClose: () => void;
+// }) {
+//   const { t, lang } = useLanguage();
+
+//   useEffect(() => {
+//     document.body.style.overflow = "hidden";
+//     return () => {
+//       document.body.style.overflow = "";
+//     };
+//   }, []);
+
+//   const displaySession = translateNumbers(member.session, lang);
+//   const displayCommitteeYear = translateNumbers(member.committee_year, lang);
+//   const displayPhone = translateNumbers(member.phone ?? null, lang);
+
+//   const designationLabel = member.designation
+//     ? resolveDesignation(member.designation, lang)
+//     : null;
+
+//   return (
+//     <div
+//       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+//       onClick={(e) => e.target === e.currentTarget && onClose()}
+//     >
+//       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-up flex flex-col max-h-[90vh]">
+//         <div className="h-1 shrink-0 bg-gradient-to-r from-[#c9a84c] to-[#e8c96d]" />
+
+//         {/* Header */}
+//         <div className="bg-[#0a1628] px-6 pt-8 pb-6 flex flex-col items-center text-center relative shrink-0">
+//           <button
+//             onClick={onClose}
+//             aria-label={t.members.modalClose}
+//             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+//           >
+//             <X className="w-4 h-4" />
+//           </button>
+
+//           <Avatar name={member.name} photoUrl={member.photo_url} size="lg" />
+//           <h2 className="text-white font-bold text-xl mt-4 leading-snug">
+//             {member.name}
+//           </h2>
+
+//           <div className="flex flex-wrap justify-center gap-2 mt-3">
+//             {designationLabel && (
+//               <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#c9a84c] text-[#0a1628]">
+//                 ⭐ {designationLabel}
+//               </span>
+//             )}
+//             {member.is_alumni && (
+//               <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
+//                 🎓 {t.members.badgeAlumni}
+//               </span>
+//             )}
+//             {member.blood_group && (
+//               <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 ring-1 ring-red-500/30">
+//                 🩸 {member.blood_group}
+//               </span>
+//             )}
+//           </div>
+//         </div>
+
+//         {/* Scrollable Info Body */}
+//         <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto">
+//           {member.department && (
+//             <InfoRow
+//               icon={<Building2 className="w-5 h-5 text-gray-400" />}
+//               label={t.members.fieldDepartment}
+//               value={member.department}
+//             />
+//           )}
+//           {displaySession && (
+//             <InfoRow
+//               icon={<Calendar className="w-5 h-5 text-gray-400" />}
+//               label={t.members.fieldSession}
+//               value={displaySession}
+//             />
+//           )}
+//           {displayCommitteeYear && (
+//             <InfoRow
+//               icon={<Award className="w-5 h-5 text-gray-400" />}
+//               label={t.members.fieldCommittee}
+//               value={displayCommitteeYear}
+//             />
+//           )}
+//           {displayPhone && (
+//             <InfoRow
+//               icon={<Phone className="w-5 h-5 text-[#c9a84c]" />}
+//               label={t.members.fieldPhone}
+//               value={
+//                 <a
+//                   href={`tel:${member.phone}`}
+//                   className="text-[#c9a84c] hover:underline font-semibold"
+//                 >
+//                   {displayPhone}
+//                 </a>
+//               }
+//             />
+//           )}
+//           {member.bio && (
+//             <div className="pt-4 border-t border-gray-100">
+//               <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+//                 {t.members.fieldBio}
+//               </p>
+//               <p className="text-sm text-gray-600 leading-relaxed">
+//                 {member.bio}
+//               </p>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Footer */}
+//         <div className="shrink-0 px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-3">
+//           <button
+//             onClick={onClose}
+//             className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition-colors"
+//           >
+//             {t.members.modalClose}
+//           </button>
+//           {member.facebook_url && (
+//             <a
+//               href={member.facebook_url}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity shadow-sm"
+//             >
+//               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+//                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+//               </svg>
+//               {t.members.modalFacebookCta}
+//             </a>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// ─── Member Detail Modal ──────────────────────────────────────────────────────
+
 function MemberModal({
   member,
   onClose,
@@ -144,24 +291,25 @@ function MemberModal({
 
           <div className="flex flex-wrap justify-center gap-2 mt-3">
             {designationLabel && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#c9a84c] text-[#0a1628]">
-                ⭐ {designationLabel}
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#c9a84c] text-[#0a1628]">
+                <Star className="w-3 h-3 fill-current" /> {designationLabel}
               </span>
             )}
             {member.is_alumni && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
-                🎓 {t.members.badgeAlumni}
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
+                <GraduationCap className="w-3 h-3" /> {t.members.badgeAlumni}
               </span>
             )}
             {member.blood_group && (
-              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 ring-1 ring-red-500/30">
-                🩸 {member.blood_group}
+              <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 ring-1 ring-red-500/30">
+                <Droplet className="w-3 h-3 fill-current" />{" "}
+                {member.blood_group}
               </span>
             )}
           </div>
         </div>
 
-        {/* Scrollable Info Body */}
+        {/* Scrollable Info Body (Left Aligned) */}
         <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto">
           {member.department && (
             <InfoRow
@@ -279,6 +427,11 @@ function MemberCard({
     : null;
   const displaySession = translateNumbers(member.session, lang);
 
+  // Department এর নাম থেকে "Department of " অংশটুকু স্বয়ংক্রিয়ভাবে বাদ দেওয়ার লজিক
+  const cleanDepartment = member.department
+    ? member.department.replace(/^Department of\s+/i, "")
+    : "—";
+
   return (
     <article
       className="animate-fade-up bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group cursor-pointer"
@@ -295,8 +448,8 @@ function MemberCard({
           }}
         />
         {member.blood_group && (
-          <span className="absolute top-3 right-3 text-[10px] font-bold text-white/90 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/20 z-10">
-            🩸 {member.blood_group}
+          <span className="absolute top-3 right-3 flex items-center gap-1 text-[10px] font-bold text-white/90 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/20 z-10">
+            <Droplet className="w-3 h-3 fill-current" /> {member.blood_group}
           </span>
         )}
       </div>
@@ -310,31 +463,32 @@ function MemberCard({
           {member.name}
         </h3>
 
-        {/* Role badges */}
-        <div className="flex flex-wrap justify-center gap-1.5 mt-2 mb-3 min-h-[1.5rem]">
+        {/* Role & Session badges (Vertically Aligned) */}
+        <div className="flex flex-col items-center gap-1.5 mt-2 mb-3 min-h-[1.5rem]">
           {isCommittee && designationLabel && (
-            <span className="text-[10px] font-bold text-[#0a1628] bg-[#c9a84c] px-2.5 py-0.5 rounded-full shadow-sm">
-              ⭐ {designationLabel}
+            <span className="flex items-center justify-center gap-1 text-[10px] font-bold text-[#0a1628] bg-[#c9a84c] px-2.5 py-0.5 rounded-full shadow-sm text-center">
+              <Star className="w-3 h-3 fill-current shrink-0" />{" "}
+              {designationLabel}
             </span>
           )}
           {member.is_alumni && (
-            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full">
-              🎓 {t.members.badgeAlumni}
+            <span className="flex items-center justify-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full text-center">
+              <GraduationCap className="w-3 h-3 shrink-0" />{" "}
+              {t.members.badgeAlumni}
+            </span>
+          )}
+          {displaySession && (
+            <span className="flex items-center justify-center gap-1 text-[10px] font-mono text-gray-600 bg-gray-100 border border-gray-200 px-2.5 py-0.5 rounded-full text-center">
+              <Calendar className="w-3 h-3 shrink-0" /> {displaySession}
             </span>
           )}
         </div>
 
-        <div className="w-full pt-3 mt-auto border-t border-gray-100 flex flex-col gap-1.5 text-xs text-gray-500">
-          <div className="flex items-center justify-center gap-1.5 truncate">
-            <Building2 className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-            <span className="truncate">{member.department ?? "—"}</span>
-          </div>
-          {displaySession && (
-            <div className="flex items-center justify-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-              <span>{displaySession}</span>
-            </div>
-          )}
+        {/* Centered Clean Department Name */}
+        <div className="w-full pt-3 mt-auto border-t border-gray-100 flex justify-center items-center text-xs text-gray-700">
+          <span className="font-semibold text-center line-clamp-2 px-2 leading-tight">
+            {cleanDepartment}
+          </span>
         </div>
 
         {/* Hover Action */}

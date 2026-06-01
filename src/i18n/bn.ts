@@ -95,6 +95,9 @@ const bn: Dictionary = {
     emptyState: "কোনো সদস্য খুঁজে পাওয়া যায়নি",
     emptyStateSearchHint: "এই নামে কোনো ফলাফল নেই",
     emptyStateClearCta: "সব সদস্য দেখুন",
+    tabBlood: "রক্তদাতা 🩸",
+    filterBloodGroup: "ব্লাড গ্রুপ ফিল্টার করুন:",
+    emptyStateClearFilters: "ফিল্টার ক্লিয়ার করুন",
   },
   home: {
     tickerLabel: "নোটিশ",
@@ -134,6 +137,7 @@ const bn: Dictionary = {
     noticesViewAllMobile: "সব নোটিশ দেখুন →",
     facebookCtaText: "আমাদের ফেসবুক গ্রুপে যোগ দিন, সর্বশেষ আপডেট পান।",
     facebookCtaButton: "Facebook গ্রুপে যোগ দিন",
+    heroCtaBlood: "রক্তদাতা খুঁজুন",
   },
   activities: {
     pageSupertitle: "আমাদের কার্যক্রম",
@@ -510,6 +514,9 @@ const bn: Dictionary = {
       deleting: "মুছছে...",
       deleteBtn: "মুছুন",
     },
+    fieldImpact: "উপকৃত সংখ্যা / ইমপ্যাক্ট",
+    fieldImpactHint:
+      "কতজন শিক্ষার্থী উপকৃত হয়েছে বা কত ব্যাগ রক্ত দেওয়া হয়েছে তার সংখ্যা (ঐচ্ছিক)",
   },
   adminActivitiesEdit: {
     back: "কার্যক্রম তালিকায় ফিরে যান",
@@ -552,6 +559,9 @@ const bn: Dictionary = {
     publishingBtn: "সেভ হচ্ছে...",
     updateBtn: "✓ পরিবর্তন সেভ করুন",
     updatingBtn: "আপডেট হচ্ছে...",
+    fieldImpact: "উপকৃত সংখ্যা / ইমপ্যাক্ট",
+    fieldImpactHint:
+      "কতজন শিক্ষার্থী উপকৃত হয়েছে বা কত ব্যাগ রক্ত দেওয়া হয়েছে তার সংখ্যা (ঐচ্ছিক)",
   },
   adminGalleryList: {
     supertitle: "অ্যাডমিন প্যানেল",
@@ -610,7 +620,7 @@ const bn: Dictionary = {
     title: "অ্যাডমিন লগইন",
     subtitle: "তীর্থ পরিচালনা প্যানেলে স্বাগতম",
     emailLabel: "ইমেইল",
-    emailPlaceholder: "admin@tirthadu.org",
+    emailPlaceholder: "admin@tirthodu.org",
     passwordLabel: "পাসওয়ার্ড",
     passwordPlaceholder: "••••••••",
     showPassword: "পাসওয়ার্ড দেখুন",

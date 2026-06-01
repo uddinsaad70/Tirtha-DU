@@ -17,6 +17,9 @@ import {
   Building2,
   Calendar,
   Award,
+  Droplet,
+  Star,
+  GraduationCap,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -242,20 +245,22 @@ function MemberModal({
             {member.name}
           </h2>
 
+          {/* Modal Header Badges with Lucide Icons */}
           <div className="flex flex-wrap justify-center gap-2 mt-3">
             {designationLabel && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#c9a84c] text-[#0a1628]">
-                ⭐ {designationLabel}
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#c9a84c] text-[#0a1628]">
+                <Star className="w-3 h-3 fill-current" /> {designationLabel}
               </span>
             )}
             {member.is_alumni && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
-                🎓 {t.members.badgeAlumni}
+              <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
+                <GraduationCap className="w-3 h-3" /> {t.members.badgeAlumni}
               </span>
             )}
             {member.blood_group && (
-              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 ring-1 ring-red-500/30">
-                🩸 {member.blood_group}
+              <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 ring-1 ring-red-500/30">
+                <Droplet className="w-3 h-3 fill-current" />{" "}
+                {member.blood_group}
               </span>
             )}
           </div>
@@ -376,15 +381,21 @@ function MemberCard({
     ? resolveDesignation(member.designation, lang)
     : null;
 
+  // Department এর নাম থেকে "Department of " অংশটুকু স্বয়ংক্রিয়ভাবে বাদ দেওয়ার লজিক
+  const cleanDepartment = member.department
+    ? member.department.replace(/^Department of\s+/i, "")
+    : "—";
+
   return (
     <article
       className="animate-fade-up bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative group cursor-pointer flex flex-col h-full"
       style={{ animationDelay: delay }}
       onClick={() => onOpen(member)}
     >
+      {/* Blood Group Badge with Lucide Icon */}
       {member.blood_group && (
-        <span className="absolute top-3.5 right-3.5 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100 z-10">
-          🩸 {member.blood_group}
+        <span className="absolute top-3.5 right-3.5 flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-100 z-10">
+          <Droplet className="w-3 h-3 fill-current" /> {member.blood_group}
         </span>
       )}
 
@@ -394,26 +405,32 @@ function MemberCard({
           {member.name}
         </h3>
 
-        {/* Role badges */}
-        <div className="flex flex-wrap justify-center gap-1.5 mt-2 mb-3 min-h-[1.5rem]">
+        {/* Role & Session badges with Lucide Icons (Vertically Aligned) */}
+        <div className="flex flex-col items-center gap-1.5 mt-2 mb-3 min-h-[1.5rem]">
           {isCommittee && designationLabel && (
-            <span className="text-[10px] font-bold text-[#0a1628] bg-[#c9a84c] px-2 py-0.5 rounded-full">
-              ⭐ {designationLabel}
+            <span className="flex items-center justify-center gap-1 text-[10px] font-bold text-[#0a1628] bg-[#c9a84c] px-2 py-0.5 rounded-full text-center">
+              <Star className="w-3 h-3 shrink-0 fill-current" />{" "}
+              {designationLabel}
             </span>
           )}
           {member.is_alumni && (
-            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
-              🎓 {t.members.badgeAlumni}
+            <span className="flex items-center justify-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full text-center">
+              <GraduationCap className="w-3 h-3 shrink-0" />{" "}
+              {t.members.badgeAlumni}
+            </span>
+          )}
+          {member.session && (
+            <span className="flex items-center justify-center gap-1 text-[10px] font-mono text-gray-600 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full text-center">
+              <Calendar className="w-3 h-3 shrink-0" />{" "}
+              {translateNumbers(member.session, lang)}
             </span>
           )}
         </div>
 
-        <div className="w-full pt-3 mt-auto border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
-          <span className="font-medium truncate max-w-[60%] text-left">
-            {member.department ?? "—"}
-          </span>
-          <span className="shrink-0 font-mono">
-            {member.session ? translateNumbers(member.session, lang) : "—"}
+        {/* Updated Department Name: Thicker (semibold) and Darker (gray-700) */}
+        <div className="w-full pt-3 mt-auto border-t border-gray-100 flex justify-center items-center text-xs text-gray-700">
+          <span className="font-semibold text-center line-clamp-2 px-2 leading-tight">
+            {cleanDepartment}
           </span>
         </div>
 
@@ -456,6 +473,7 @@ export default function MembersClient({
     newSearch: string,
     newSort: string,
     newStatus: string,
+    newBloodGroup?: string, // <--- এই ৪ নম্বর আর্গুমেন্টটি যোগ করা হয়েছে
   ) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -468,6 +486,13 @@ export default function MembersClient({
     if (newStatus && newStatus !== "all") params.set("status", newStatus);
     else params.delete("status");
 
+    // ব্লাড গ্রুপের জন্য লজিক
+    if (newStatus === "blood" && newBloodGroup) {
+      params.set("blood", newBloodGroup);
+    } else {
+      params.delete("blood");
+    }
+
     params.set("page", "1");
 
     startTransition(() => {
@@ -477,18 +502,31 @@ export default function MembersClient({
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    updateParams(searchValue, initialSort, initialStatus);
+    updateParams(
+      searchValue,
+      initialSort,
+      initialStatus,
+      searchParams.get("blood") || "",
+    );
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateParams(searchValue, e.target.value, initialStatus);
+    updateParams(
+      searchValue,
+      e.target.value,
+      initialStatus,
+      searchParams.get("blood") || "",
+    );
   };
 
   const tabs = [
     { key: "all", label: t.members.tabAll, count: totalCount },
     { key: "current", label: t.members.tabCurrent, count: currentCount },
     { key: "alumni", label: t.members.tabAlumni, count: alumniCount },
+    { key: "blood", label: t.members.tabBlood, count: bloodGroupCount },
   ];
+
+  const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   return (
     <div className="bg-[#f5f3ee] min-h-screen pb-20 flex flex-col">
@@ -592,6 +630,38 @@ export default function MembersClient({
           </div>
         </div>
 
+        {initialStatus === "blood" && (
+          <div className="mt-6 flex flex-wrap justify-center items-center gap-2 bg-red-50 p-4 rounded-xl border border-red-100 animate-fade-up">
+            <span className="w-full sm:w-auto flex justify-center items-center gap-1.5 text-sm font-bold text-red-700 mb-1 sm:mb-0 sm:mr-2">
+              <Droplet className="w-4 h-4 fill-current" />{" "}
+              {t.members.filterBloodGroup}
+            </span>
+
+            {bloodGroups.map((bg) => {
+              const isActive = searchParams.get("blood") === bg;
+              return (
+                <button
+                  key={bg}
+                  onClick={() =>
+                    updateParams(
+                      searchValue,
+                      initialSort,
+                      "blood",
+                      isActive ? "" : bg,
+                    )
+                  }
+                  className={`px-3.5 py-1.5 rounded-lg text-sm font-bold transition-all duration-200 ${
+                    isActive
+                      ? "bg-red-500 text-white shadow-md scale-105"
+                      : "bg-white text-red-600 border border-red-200 hover:bg-red-100"
+                  }`}
+                >
+                  {bg}
+                </button>
+              );
+            })}
+          </div>
+        )}
         {/* ── Grid or empty state ──────────────────────────────────────────── */}
         {members.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
@@ -608,23 +678,28 @@ export default function MembersClient({
           <div className="flex flex-col items-center justify-center py-20 text-center flex-1 bg-white rounded-2xl border border-gray-100 shadow-sm">
             <Users className="w-12 h-12 mb-4 text-[#c9a84c] opacity-50" />
             <p className="text-base font-semibold text-[#0a1628]">
-              {initialSearch
+              {initialSearch || searchParams.get("blood")
                 ? lang === "bn"
                   ? "কোনো মেম্বার পাওয়া যায়নি।"
                   : "No members found."
                 : t.members.emptyState}
             </p>
-            {initialSearch && (
+            {(initialSearch || searchParams.get("blood")) && (
               <p className="text-sm text-gray-400 mt-1">
-                &quot;{initialSearch}&quot; — {t.members.emptyStateSearchHint}
+                {initialSearch && `"${initialSearch}" — `}
+                {searchParams.get("blood") &&
+                  `Blood Group: ${searchParams.get("blood")} — `}
+                {t.members.emptyStateSearchHint}
               </p>
             )}
-            {initialSearch && (
+
+            {/* ফিল্টার ক্লিয়ার বাটন */}
+            {(initialSearch || searchParams.get("blood")) && (
               <button
-                onClick={() => updateParams("", initialSort, initialStatus)}
-                className="mt-4 text-sm text-[#c9a84c] hover:underline font-semibold"
+                onClick={() => updateParams("", initialSort, initialStatus, "")}
+                className="mt-4 text-sm text-red-500 hover:underline font-semibold"
               >
-                {t.members.emptyStateClearCta}
+                {t.members.emptyStateClearFilters}
               </button>
             )}
           </div>

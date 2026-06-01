@@ -37,7 +37,7 @@ export interface Dictionary {
 
   // ── Committee page ───────────────────────────────────────────────────────
   committee: {
-    pageSupertitle: string; // "তীর্থ পরিচালনা পর্ষদ" / "Tirtha Governing Body"
+    pageSupertitle: string; // "তীর্থ পরিচালনা পর্ষদ" / "tirtho Governing Body"
     pageTitle: string;
     pageSubtitle: string;
     tabCurrent: string; // year is appended in component via interpolation
@@ -113,6 +113,9 @@ export interface Dictionary {
     emptyState: string;
     emptyStateSearchHint: string;
     emptyStateClearCta: string;
+    tabBlood: string;
+    filterBloodGroup: string;
+    emptyStateClearFilters: string;
   };
 
   home: {
@@ -146,6 +149,7 @@ export interface Dictionary {
     // Facebook CTA
     facebookCtaText: string;
     facebookCtaButton: string;
+    heroCtaBlood: string;
   };
   activities: {
     // Hero
@@ -473,6 +477,8 @@ export interface Dictionary {
       deleting: string;
       deleteBtn: string;
     };
+    fieldImpact: string;
+    fieldImpactHint: string;
   };
   adminActivitiesEdit: {
     back: string;
@@ -513,6 +519,8 @@ export interface Dictionary {
     publishingBtn: string;
     updateBtn: string;
     updatingBtn: string;
+    fieldImpact: string;
+    fieldImpactHint: string;
   };
   adminGalleryList: {
     supertitle: string;

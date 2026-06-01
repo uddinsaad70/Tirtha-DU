@@ -334,6 +334,14 @@ export default function HomePageClient({
           </p>
 
           <div className="animate-fade-up animation-delay-300 flex flex-col sm:flex-row gap-3 mt-2">
+            {/* নতুন ইমার্জেন্সি ব্লাড ডোনার বাটন */}
+            <Link
+              href="/members?status=blood"
+              className="px-7 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90 transition-opacity shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
+            >
+              <Droplet className="w-5 h-5 fill-current" />
+              {t.home.heroCtaBlood}
+            </Link>
             <Link
               href="/about"
               className="px-7 py-3 rounded-xl font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity shadow-lg shadow-[#c9a84c]/20"

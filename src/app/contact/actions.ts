@@ -41,8 +41,8 @@ export async function sendContactMessage(
     const { error } = await resend.emails.send({
       // 'from' must be a verified domain in your Resend account.
       // During development you can use: onboarding@resend.dev
-      from: "তীর্থ ওয়েবসাইট <noreply@tirthadu.org>",
-      to: ["info@tirthadu.org"], // your receiving inbox
+      from: "তীর্থ ওয়েবসাইট <noreply@tirthodu.org>",
+      to: ["info@tirthodu.org"], // your receiving inbox
       replyTo: contact.includes("@") ? contact : undefined,
       subject: `[তীর্থ] নতুন বার্তা — ${name}`,
       html: `

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { translateNumbers } from "@/utils/translateNumbers";
 import { siteConfig } from "@/config/siteConfig";
+import Image from "next/image";
 
 export default function Footer() {
   const pathname = usePathname();
@@ -34,13 +35,22 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c9a84c] to-[#e8c96d] flex items-center justify-center text-[#0a1628] font-bold text-lg">
-                তী
+              {/* নতুন লোগো সেকশন */}
+              <div className="relative w-10 h-10">
+                <Image
+                  src="/logo.png"
+                  alt="Tirtho Logo"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-contain"
+                />
               </div>
+
+              {/* ডানপাশের টেক্সট */}
               <div className="flex flex-col leading-none">
                 <span className="text-white font-bold text-lg">তীর্থ</span>
                 <span className="text-[#c9a84c] text-[10px] tracking-widest uppercase">
-                  Tirtha • DU
+                  Tirtho • DU
                 </span>
               </div>
             </div>
@@ -83,7 +93,7 @@ export default function Footer() {
                   href={`mailto:${siteConfig.contact.email}`}
                   className="hover:text-[#c9a84c] transition-colors"
                 >
-                  info@tirthadu.org
+                  info@tirthodu.org
                 </a>
               </li>
               <li>
@@ -96,7 +106,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-[#c9a84c] transition-colors"
                 >
-                  facebook.com/tirthadu
+                  facebook.com/tirthodu
                 </a>
               </li>
               <li>

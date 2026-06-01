@@ -49,7 +49,10 @@ export default function NewActivityPage() {
     createActivity,
     INITIAL_STATE,
   );
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // 👇 ক্যাটাগরি ট্র্যাক করার জন্য নতুন স্টেট
+  const [selectedCategory, setSelectedCategory] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filePreviewUrl = selectedFile
@@ -79,6 +82,7 @@ export default function NewActivityPage() {
           className="divide-y divide-gray-50"
           noValidate
         >
+          {/* === Section 1: Basic Info === */}
           <div className="p-6 sm:p-8 flex flex-col gap-5">
             <SectionHeading title={t.adminActivitiesEdit.sectionBasic} />
 
@@ -106,6 +110,7 @@ export default function NewActivityPage() {
                 required
                 className={inputCls}
                 defaultValue=""
+                onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="" disabled>
                   {t.adminActivitiesEdit.selectPlaceholder}
@@ -138,8 +143,25 @@ export default function NewActivityPage() {
                 className={`${inputCls} resize-none`}
               />
             </Field>
+
+            {(selectedCategory === "Academic Care" ||
+              selectedCategory === "Blood Donation") && (
+              <Field
+                label={t.adminActivitiesEdit.fieldImpact}
+                hint={t.adminActivitiesEdit.fieldImpactHint}
+              >
+                <input
+                  type="number"
+                  name="impact_count"
+                  defaultValue={0}
+                  min={0}
+                  className={inputCls}
+                />
+              </Field>
+            )}
           </div>
 
+          {/* === Section 2: Photo Upload === */}
           <div className="p-6 sm:p-8 flex flex-col gap-5">
             <SectionHeading title={t.adminActivitiesEdit.sectionPhoto} />
             <Field
@@ -191,6 +213,7 @@ export default function NewActivityPage() {
             </Field>
           </div>
 
+          {/* === Section 3: Display Settings === */}
           <div className="p-6 sm:p-8 flex flex-col gap-5">
             <SectionHeading title={t.adminActivitiesEdit.sectionDisplay} />
             <Field
@@ -210,6 +233,7 @@ export default function NewActivityPage() {
             </Field>
           </div>
 
+          {/* === Section 4: Form Actions (Footer) === */}
           <div className="p-6 sm:p-8 bg-gray-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {state.error ? (
               <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">

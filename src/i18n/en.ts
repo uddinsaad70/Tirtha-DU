@@ -30,7 +30,7 @@ const en: Dictionary = {
   },
 
   committee: {
-    pageSupertitle: "Tirtha Governing Body",
+    pageSupertitle: "Tirtho Governing Body",
     pageTitle: "Committee",
     pageSubtitle:
       "The dedicated members who lead every initiative and carry the organization forward.",
@@ -73,7 +73,7 @@ const en: Dictionary = {
     pageSupertitle: "Our Family",
     pageTitle: "Members",
     pageSubtitle:
-      "Browse current students, alumni, and volunteers of Tirtha. Click any card to view details.",
+      "Browse current students, alumni, and volunteers of Tirtho. Click any card to view details.",
     statTotal: "Total Members",
     statCurrent: "Current",
     statAlumni: "Alumni",
@@ -95,6 +95,9 @@ const en: Dictionary = {
     emptyState: "No members found",
     emptyStateSearchHint: "No results for this search",
     emptyStateClearCta: "View all members",
+    tabBlood: "Blood Donors 🩸",
+    filterBloodGroup: "Filter by Group:",
+    emptyStateClearFilters: "Clear Filters",
   },
   home: {
     tickerLabel: "Notice",
@@ -104,9 +107,9 @@ const en: Dictionary = {
     noticeView: "View →",
     heroBadge: "Est. 2007 • University of Dhaka",
     heroTitlePrefix: "Welcome to",
-    heroTitleHighlight: "Tirtha",
+    heroTitleHighlight: "Tirtho",
     heroTagline:
-      "Tirtha works tirelessly for the academic, social, and humanitarian welfare of University of Dhaka students — towards the light, together.",
+      "Tirtho works tirelessly for the academic, social, and humanitarian welfare of University of Dhaka students — towards the light, together.",
     heroMotto:
       "Unity, humanity, and education are the foundations of an enlightened society",
     heroCtaAbout: "Learn About Us",
@@ -135,12 +138,13 @@ const en: Dictionary = {
     noticesViewAllMobile: "View all notices →",
     facebookCtaText: "Join our Facebook group to stay updated.",
     facebookCtaButton: "Join Facebook Group",
+    heroCtaBlood: "Find Blood Donor",
   },
   activities: {
     pageSupertitle: "Our Activities",
     pageTitle: "What We Believe In",
     pageSubtitle:
-      "Tirtha is more than an organization — it is a commitment. From academic support to humanitarian service, blood donation to cultural programs, we work without pause.",
+      "Tirtho is more than an organization — it is a commitment. From academic support to humanitarian service, blood donation to cultural programs, we work without pause.",
     categories: {
       "Academic Care": { label: "Academic Support", shortLabel: "Academic" },
       "Blood Donation": { label: "Blood Donation", shortLabel: "Blood Drive" },
@@ -163,7 +167,7 @@ const en: Dictionary = {
     pageSupertitle: "Updates & Memories",
     pageTitle: "News & Gallery",
     pageSubtitle:
-      "The latest notices, announcements, and memorable photos from Tirtha's events — all in one place.",
+      "The latest notices, announcements, and memorable photos from Tirtho's events — all in one place.",
     tabNotices: "📋 Notices & Announcements",
     tabGallery: "📷 Photo Gallery",
     badgeNew: "New",
@@ -186,7 +190,7 @@ const en: Dictionary = {
     heroBadge: "Est. 2007 • University of Dhaka",
     heroTitle: "About Us",
     heroSubtitle:
-      "Born from a dream, Tirtha is now a symbol of hope for thousands of students. This journey of spreading light has continued for over 18 years.",
+      "Born from a dream, Tirtho is now a symbol of hope for thousands of students. This journey of spreading light has continued for over 18 years.",
     heroMotto:
       '"Unity, humanity, and education are the foundations of an enlightened society"',
     statLabels: {
@@ -201,7 +205,7 @@ const en: Dictionary = {
       {
         icon: "📚",
         title: "Education",
-        body: "Building enlightened students is Tirtha's primary goal. From academic support to skill development — we believe every student is full of potential.",
+        body: "Building enlightened students is Tirtho's primary goal. From academic support to skill development — we believe every student is full of potential.",
       },
       {
         icon: "🤝",
@@ -211,22 +215,22 @@ const en: Dictionary = {
       {
         icon: "✊",
         title: "Unity",
-        body: "Tirtha binds students from various departments and backgrounds together. Unity in diversity is our greatest strength.",
+        body: "Tirtho binds students from various departments and backgrounds together. Unity in diversity is our greatest strength.",
       },
     ],
     missionSuperTitle: "Our Mission",
     missionBody:
-      "Tirtha's mission is to build a culture of social responsibility, humanitarian values, and academic excellence among the students of the University of Dhaka. We believe an educated and humane young generation can illuminate the future of Bangladesh.",
+      "Tirtho's mission is to build a culture of social responsibility, humanitarian values, and academic excellence among the students of the University of Dhaka. We believe an educated and humane young generation can illuminate the future of Bangladesh.",
     visionSuperTitle: "Our Vision",
     visionBody:
-      "Our vision is to build a university community where no student has to fight alone. In academic crises, health emergencies, or any difficult moments in life — Tirtha will always stand by you.",
+      "Our vision is to build a university community where no student has to fight alone. In academic crises, health emergencies, or any difficult moments in life — Tirtho will always stand by you.",
     timelineSuperTitle: "Our Journey",
     timelineTitle: "History",
     timeline: [
       {
         year: "2007",
         title: "Foundation",
-        body: "Tirtha began its journey with a group of enthusiastic students from the University of Dhaka. It started with just 20 founding members.",
+        body: "Tirtho began its journey with a group of enthusiastic students from the University of Dhaka. It started with just 20 founding members.",
       },
       {
         year: "2010",
@@ -241,20 +245,20 @@ const en: Dictionary = {
       {
         year: "2017",
         title: "Humanitarian Aid Fund",
-        body: "A permanent fund was established to provide quick assistance during natural disasters and personal crises. Tirtha was one of the first organizations to respond to the Rohingya crisis.",
+        body: "A permanent fund was established to provide quick assistance during natural disasters and personal crises. Tirtho was one of the first organizations to respond to the Rohingya crisis.",
       },
       {
         year: "2020",
         title: "Shift to Virtual Operations",
-        body: "During the pandemic, Tirtha continued its activities by launching online academic sessions, virtual blood donor networks, and online cultural programs.",
+        body: "During the pandemic, Tirtho continued its activities by launching online academic sessions, virtual blood donor networks, and online cultural programs.",
       },
       {
         year: "2026",
         title: "Two Decades of Journey",
-        body: "In its nearly 20-year journey, Tirtha now has over 1,000 members. Every year, it brings light into the lives of thousands of students through blood donation, academic aid, and humanitarian work.",
+        body: "In its nearly 20-year journey, Tirtho now has over 1,000 members. Every year, it brings light into the lives of thousands of students through blood donation, academic aid, and humanitarian work.",
       },
     ],
-    ctaTitle: "Join Tirtha",
+    ctaTitle: "Join Tirtho",
     ctaSubtitle:
       "You too can be a part of this journey of light. Become a member, volunteer, or join any of our activities.",
     ctaContactBtn: "Contact Us",
@@ -305,10 +309,10 @@ const en: Dictionary = {
     facebookLabel: "Facebook",
     addressLabel: "Address",
     addressValue: "University of Dhaka, Dhaka-1000",
-    copyright: "© {year} Tirtha, University of Dhaka. All rights reserved.",
+    copyright: "© {year} Tirtho, University of Dhaka. All rights reserved.",
   },
   adminDashboard: {
-    supertitle: "Tirtha Admin Panel",
+    supertitle: "Tirtho Admin Panel",
     title: "Dashboard",
     welcomeMsg: "Welcome, ",
     statLabels: {
@@ -342,7 +346,7 @@ const en: Dictionary = {
       '"Unity, humanity, and education are the foundations of an enlightened society"',
   },
   adminSidebar: {
-    brand: "Tirtha",
+    brand: "Tirtho",
     brandSub: "Admin Panel",
     menuLabel: "MENU",
     nav: {
@@ -518,6 +522,9 @@ const en: Dictionary = {
       deleting: "Deleting...",
       deleteBtn: "Delete",
     },
+    fieldImpact: "Impact / Beneficiaries",
+    fieldImpactHint:
+      "Number of students helped or blood bags donated (Optional)",
   },
   adminActivitiesEdit: {
     back: "Back to Activities",
@@ -558,6 +565,9 @@ const en: Dictionary = {
     publishingBtn: "Saving...",
     updateBtn: "✓ Save Changes",
     updatingBtn: "Updating...",
+    fieldImpact: "Impact / Beneficiaries",
+    fieldImpactHint:
+      "Number of students helped or blood bags donated (Optional)",
   },
   adminGalleryList: {
     supertitle: "Admin Panel",
@@ -614,9 +624,9 @@ const en: Dictionary = {
   login: {
     back: "Back to Main Site",
     title: "Admin Login",
-    subtitle: "Welcome to Tirtha Admin Panel",
+    subtitle: "Welcome to Tirtho Admin Panel",
     emailLabel: "Email",
-    emailPlaceholder: "admin@tirthadu.org",
+    emailPlaceholder: "admin@Tirthodu.org",
     passwordLabel: "Password",
     passwordPlaceholder: "••••••••",
     showPassword: "Show password",
@@ -624,7 +634,7 @@ const en: Dictionary = {
     loginBtn: "Login",
     loggingInBtn: "Logging in...",
     footerNote: "For authorized admins only",
-    copyright: "© {year} Tirtha, University of Dhaka",
+    copyright: "© {year} Tirtho, University of Dhaka",
     error: {
       invalidCredentials: "Invalid email or password. Please try again.",
       unconfirmedEmail: "Email not verified. Please check your inbox.",

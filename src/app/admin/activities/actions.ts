@@ -83,11 +83,22 @@ function extractActivityFields(formData: FormData) {
   const is_published = formData.get("is_published") !== "false";
   const remove_image = formData.get("remove_image") === "true";
 
+  const rawImpactCount = formData.get("impact_count")?.toString().trim();
+  const impact_count = rawImpactCount ? parseInt(rawImpactCount, 10) : 0;
+
   const fileInput = formData.get("cover_image");
   const imageFile =
     fileInput instanceof File && fileInput.size > 0 ? fileInput : null;
 
-  return { title, body, category, is_published, remove_image, imageFile };
+  return {
+    title,
+    body,
+    category,
+    is_published,
+    remove_image,
+    imageFile,
+    impact_count,
+  };
 }
 
 // ─── createActivity ───────────────────────────────────────────────────────────
@@ -122,6 +133,7 @@ export async function createActivity(
     category: fields.category,
     cover_image_url,
     is_published: fields.is_published,
+    impact_count: fields.impact_count,
   });
 
   if (error) {
@@ -177,6 +189,7 @@ export async function updateActivity(
       category: fields.category,
       cover_image_url,
       is_published: fields.is_published,
+      impact_count: fields.impact_count,
     })
     .eq("id", id);
 

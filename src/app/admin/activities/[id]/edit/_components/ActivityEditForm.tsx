@@ -2,19 +2,11 @@
 
 import { useActionState, useRef, useState } from "react";
 import Link from "next/link";
-import { useLanguage } from "@/context/LanguageContext";
 import { updateActivity, type ActionState } from "../../../actions";
-import {
-  ArrowLeft,
-  Image as ImageIcon,
-  Trash2,
-  Check,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, Check, ImageIcon, Loader2, Trash2 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const INITIAL_STATE: ActionState = { error: null };
-const inputCls =
-  "w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[#0a1628] placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c9a84c]/40 focus:border-[#c9a84c] transition-all bg-white";
 
 function Field({
   label,
@@ -30,7 +22,8 @@ function Field({
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-sm font-semibold text-[#0a1628]">
-        {label} {required && <span className="text-red-400 ml-1">*</span>}
+        {label}
+        {required && <span className="text-red-400 ml-1">*</span>}
       </label>
       {children}
       {hint && <p className="text-xs text-gray-400 leading-relaxed">{hint}</p>}
@@ -49,6 +42,10 @@ function SectionHeading({ title }: { title: string }) {
   );
 }
 
+const inputCls =
+  "w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-[#0a1628] placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c9a84c]/40 focus:border-[#c9a84c] transition-all bg-white";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ActivityEditForm({ activity }: { activity: any }) {
   const { t } = useLanguage();
   const boundAction = updateActivity.bind(
@@ -63,6 +60,11 @@ export default function ActivityEditForm({ activity }: { activity: any }) {
 
   const [removeFile, setRemoveFile] = useState(false);
   const [newFile, setNewFile] = useState<File | null>(null);
+
+  // 👇 ক্যাটাগরি ট্র্যাক করার জন্য নতুন স্টেট, ডিফল্ট ভ্যালু হিসেবে বর্তমান ক্যাটাগরি দেওয়া হলো
+  const [selectedCategory, setSelectedCategory] = useState(
+    activity?.category || "",
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasExistingFile = activity.cover_image_url && !removeFile;
@@ -106,6 +108,7 @@ export default function ActivityEditForm({ activity }: { activity: any }) {
             value={removeFile ? "true" : "false"}
           />
 
+          {/* === Section 1: Basic Info === */}
           <div className="p-6 sm:p-8 flex flex-col gap-5">
             <SectionHeading title={t.adminActivitiesEdit.sectionBasic} />
             <Field
@@ -126,6 +129,7 @@ export default function ActivityEditForm({ activity }: { activity: any }) {
               <select
                 name="category"
                 defaultValue={activity.category}
+                onChange={(e) => setSelectedCategory(e.target.value)}
                 required
                 className={inputCls}
               >
@@ -157,8 +161,25 @@ export default function ActivityEditForm({ activity }: { activity: any }) {
                 className={`${inputCls} resize-none`}
               />
             </Field>
+
+            {(selectedCategory === "Academic Care" ||
+              selectedCategory === "Blood Donation") && (
+              <Field
+                label={t.adminActivitiesEdit.fieldImpact}
+                hint={t.adminActivitiesEdit.fieldImpactHint}
+              >
+                <input
+                  type="number"
+                  name="impact_count"
+                  defaultValue={activity.impact_count || 0}
+                  min={0}
+                  className={inputCls}
+                />
+              </Field>
+            )}
           </div>
 
+          {/* === Section 2: Photo Upload === */}
           <div className="p-6 sm:p-8 flex flex-col gap-4">
             <SectionHeading title={t.adminActivitiesEdit.sectionPhoto} />
             {hasExistingFile && (
@@ -254,6 +275,7 @@ export default function ActivityEditForm({ activity }: { activity: any }) {
             )}
           </div>
 
+          {/* === Section 3: Display Settings === */}
           <div className="p-6 sm:p-8 flex flex-col gap-5">
             <SectionHeading title={t.adminActivitiesEdit.sectionDisplay} />
             <Field
@@ -273,6 +295,7 @@ export default function ActivityEditForm({ activity }: { activity: any }) {
             </Field>
           </div>
 
+          {/* === Section 4: Form Actions (Footer) === */}
           <div className="p-6 sm:p-8 bg-gray-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {state.error ? (
               <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">

@@ -19,6 +19,7 @@ export default async function MembersPage({
     sort?: string;
     page?: string;
     status?: string;
+    blood?: string; // নতুন প্যারামিটার
   }>;
 }) {
   const supabase = await createClient();
@@ -27,12 +28,13 @@ export default async function MembersPage({
   const search = resolvedParams.search || "";
   const sort = resolvedParams.sort || "newest";
   const status = resolvedParams.status || "all";
+  const blood = resolvedParams.blood || ""; // ব্লাড গ্রুপ রিসিভ করা
   const currentPage = Number(resolvedParams.page) || 1;
 
   const from = (currentPage - 1) * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
 
-  // ১. Hero Section এবং Tabs এ দেখানোর জন্য মোট পরিসংখ্যান (কোনো ফিল্টার ছাড়া)
+  // ১. Hero Section এবং Tabs এ দেখানোর জন্য মোট পরিসংখ্যান
   const { data: allStats } = await supabase
     .from("members")
     .select("is_current, is_alumni, designation, blood_group");
@@ -42,11 +44,13 @@ export default async function MembersPage({
   const currentCount = stats.filter((m) => m.is_current && !m.is_alumni).length;
   const alumniCount = stats.filter((m) => m.is_alumni).length;
   const committeeCount = stats.filter((m) => Boolean(m.designation)).length;
-  const bloodGroupCount = new Set(
-    stats.map((m) => m.blood_group).filter(Boolean),
-  ).size;
 
-  // ২. কার্ডগুলোর জন্য ডেটা ফেচিং (সার্চ, সর্ট এবং পেজিনেশন সহ)
+  // আপডেট: এখন এটি দেখাবে মোট কতজনের ব্লাড গ্রুপ সেভ করা আছে (কতজন রক্তদাতা)
+  const bloodGroupCount = stats.filter(
+    (m) => Boolean(m.blood_group) && m.blood_group !== "",
+  ).length;
+
+  // ২. কার্ডগুলোর জন্য ডেটা ফেচিং
   let query = supabase
     .from("members")
     .select(
@@ -61,11 +65,19 @@ export default async function MembersPage({
     );
   }
 
-  // স্ট্যাটাস অনুযায়ী ফিল্টার
+  // স্ট্যাটাস অনুযায়ী ফিল্টার
   if (status === "current") {
     query = query.eq("is_current", true).eq("is_alumni", false);
   } else if (status === "alumni") {
     query = query.eq("is_alumni", true);
+  } else if (status === "blood") {
+    // যাদের ব্লাড গ্রুপ দেওয়া আছে, শুধু তাদের দেখাবে
+    query = query.not("blood_group", "is", null).neq("blood_group", "");
+
+    // যদি নির্দিষ্ট কোনো ব্লাড গ্রুপ (যেমন A+) ফিল্টার করা হয়
+    if (blood) {
+      query = query.eq("blood_group", blood);
+    }
   }
 
   // সর্টিং
@@ -89,7 +101,6 @@ export default async function MembersPage({
   const members: Member[] = data ?? [];
   const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 1;
 
-  // page.tsx owns zero UI strings — all text lives in MembersClient
   return (
     <MembersClient
       members={members}
