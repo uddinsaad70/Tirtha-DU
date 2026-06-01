@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const hindSiliguri = Hind_Siliguri({
   subsets: ["bengali", "latin"],
@@ -48,6 +49,7 @@ export default function RootLayout({
           <main className="min-h-screen pt-16 lg:pt-20">{children}</main>
           <Footer />
         </LanguageProvider>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID as string} />
       </body>
     </html>
   );
