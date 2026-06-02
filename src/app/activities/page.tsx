@@ -3,16 +3,87 @@ import ActivitiesTabs, {
   type Activity,
   type CategoryKey,
 } from "./_components/ActivitiesTabs";
+import { Metadata, ResolvingMetadata } from "next";
+import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "কার্যক্রম",
-  description:
-    "তীর্থের একাডেমিক সহায়তা, রক্তদান, মানবিক সহায়তা ও সাংস্কৃতিক কার্যক্রমের বিস্তারিত।",
-};
-
 const ITEMS_PER_PAGE = 9;
+
+export async function generateMetadata(
+  { searchParams }: { searchParams: Promise<{ id?: string }> },
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const resolvedParams = await searchParams;
+  const id = resolvedParams.id;
+
+  const headersList = await headers();
+  const host = headersList.get("host") || "tirthodu.top";
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const baseUrl = `${protocol}://${host}`;
+
+  if (!id) {
+    return {
+      title: "কার্যক্রম | তীর্থ",
+      description:
+        "তীর্থের একাডেমিক সহায়তা, রক্তদান, মানবিক সহায়তা ও সাংস্কৃতিক কার্যক্রমের বিস্তারিত।",
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: activity } = await supabase
+    .from("activities")
+    .select("title, body, category, cover_image_url")
+    .eq("id", id)
+    .single();
+
+  if (!activity) {
+    return { title: "কার্যক্রম পাওয়া যায়নি | তীর্থ" };
+  }
+
+  const title = `${activity.title} | তীর্থ কার্যক্রম`;
+
+  // বডি যদি অনেক বড় হয়, তবে প্রথম ১০০ ক্যারেক্টার কেটে প্রিভিউতে দেখাবে
+  const description = activity.body
+    ? activity.body.length > 100
+      ? activity.body.substring(0, 100) + "..."
+      : activity.body
+    : `ক্যাটাগরি: ${activity.category}`;
+
+  const previousImages = (await parent).openGraph?.images || [];
+
+  // কভার ইমেজ ডাইনামিক পাথ
+  const ogImage = activity.cover_image_url?.startsWith("http")
+    ? activity.cover_image_url
+    : `${baseUrl}${activity.cover_image_url || "/tirtho-logo.png"}`;
+
+  return {
+    title: title,
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+      url: `${baseUrl}/activities?id=${id}`,
+      siteName: "তীর্থ ঢাকা বিশ্ববিদ্যালয়",
+      images: [
+        {
+          url: ogImage,
+          width: 800,
+          height: 600, // কার্যক্রমের ছবিগুলো ল্যান্ডস্কেপ হলে ভালো দেখায়
+          alt: activity.title,
+        },
+        ...previousImages,
+      ],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function ActivitiesPage({
   searchParams,

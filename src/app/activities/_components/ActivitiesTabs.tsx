@@ -16,6 +16,8 @@ import {
   Search,
   SlidersHorizontal,
   Loader2,
+  Share2,
+  Check,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -140,6 +142,7 @@ function ActivityModal({
   onClose: () => void;
 }) {
   const { t, lang } = useLanguage();
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -155,6 +158,43 @@ function ActivityModal({
       document.body.style.overflow = "";
     };
   }, []);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}${window.location.pathname}?id=${activity.id}`;
+    const shareData = {
+      title: `${activity.title} | Tirtho DU`,
+      text:
+        lang === "bn"
+          ? `তীর্থের কার্যক্রমটি দেখুন: ${activity.title}`
+          : `Check out this activity: ${activity.title}`,
+      url: url,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand("copy");
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch (err) {}
+        document.body.removeChild(textArea);
+      }
+    }
+  };
 
   const visual = CATEGORY_VISUAL[activity.category as CategoryKey];
   const catLabel = t.activities.categories[activity.category as CategoryKey];
@@ -218,6 +258,24 @@ function ActivityModal({
             className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
           >
             {t.activities.modalClose}
+          </button>
+
+          <button
+            onClick={handleShare}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#0a1628] hover:bg-[#1a2f4e] transition-colors shadow-sm"
+          >
+            {copied ? (
+              <Check className="w-4 h-4 text-green-400" />
+            ) : (
+              <Share2 className="w-4 h-4" />
+            )}
+            {copied
+              ? lang === "bn"
+                ? "লিংক কপি হয়েছে!"
+                : "Copied!"
+              : lang === "bn"
+                ? "শেয়ার করুন"
+                : "Share"}
           </button>
         </div>
       </div>
@@ -329,6 +387,33 @@ export default function ActivitiesTabs({
 
   const [openActivity, setOpenActivity] = useState<Activity | null>(null);
   const [searchValue, setSearchValue] = useState(initialSearch);
+
+  // --- ১. অটোমেটিক মোডাল ওপেন ---
+  useEffect(() => {
+    const idParam = searchParams.get("id");
+    if (idParam && activities.length > 0) {
+      const foundActivity = activities.find((a) => a.id.toString() === idParam);
+      if (foundActivity) {
+        setOpenActivity(foundActivity);
+      }
+    }
+  }, [searchParams, activities]);
+
+  // --- ২. মোডাল ওপেন হলে URL আপডেট ---
+  const handleOpenModal = (activity: Activity) => {
+    setOpenActivity(activity);
+    const url = new URL(window.location.href);
+    url.searchParams.set("id", activity.id.toString());
+    window.history.pushState({}, "", url.toString());
+  };
+
+  // --- ৩. মোডাল ক্লোজ হলে URL ক্লিন ---
+  const handleCloseModal = () => {
+    setOpenActivity(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("id");
+    window.history.pushState({}, "", url.toString());
+  };
 
   // ─── URL Update Logic ───────────
   const updateParams = (newSearch: string, newSort: string, newCat: string) => {
@@ -513,7 +598,7 @@ export default function ActivitiesTabs({
                   key={activity.id}
                   activity={activity}
                   index={i}
-                  onOpen={setOpenActivity}
+                  onOpen={handleOpenModal}
                 />
               ))}
             </div>
@@ -531,10 +616,7 @@ export default function ActivitiesTabs({
       </section>
 
       {openActivity && (
-        <ActivityModal
-          activity={openActivity}
-          onClose={() => setOpenActivity(null)}
-        />
+        <ActivityModal activity={openActivity} onClose={handleCloseModal} />
       )}
     </>
   );
