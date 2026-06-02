@@ -109,7 +109,7 @@ const en: Dictionary = {
     heroTitlePrefix: "Welcome to",
     heroTitleHighlight: "Tirtho",
     heroTagline:
-      "Tirtho works tirelessly for the academic, social, and humanitarian welfare of University of Dhaka students — towards the light, together.",
+      "Tirtho works tirelessly for the academic, social, and humanitarian welfare of DU students from Sharsha Upazila — towards the light, together.",
     heroMotto:
       "Unity, humanity, and education are the foundations of an enlightened society",
     heroCtaAbout: "Learn About Us",
