@@ -1,15 +1,82 @@
 import { createClient } from "@/lib/supabase/server";
 import MembersClient, { type Member } from "./_components/MembersClient";
+import { Metadata, ResolvingMetadata } from "next";
+import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
-
-export const metadata = {
-  title: "সদস্যবৃন্দ",
-  description:
-    "তীর্থের বর্তমান শিক্ষার্থী, প্রাক্তন সদস্য ও স্বেচ্ছাসেবকদের তালিকা।",
-};
-
 const ITEMS_PER_PAGE = 15;
+
+export async function generateMetadata(
+  { searchParams }: { searchParams: Promise<{ id?: string }> },
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const resolvedParams = await searchParams;
+  const id = resolvedParams.id;
+
+  const headersList = await headers();
+  const host = headersList.get("host") || "tirthodu.top";
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const baseUrl = `${protocol}://${host}`;
+
+  if (!id) {
+    return {
+      title: "সদস্যবৃন্দ | তীর্থ",
+      description:
+        "তীর্থের বর্তমান শিক্ষার্থী, প্রাক্তন সদস্য ও স্বেচ্ছাসেবকদের তালিকা।",
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: member } = await supabase
+    .from("members")
+    .select("name, designation, department, photo_url, blood_group")
+    .eq("id", id)
+    .single();
+
+  if (!member) {
+    return {
+      title: "সদস্য পাওয়া যায়নি | তীর্থ",
+    };
+  }
+
+  const title = `${member.name} | তীর্থ ঢাকা বিশ্ববিদ্যালয়`;
+  let description = "";
+  if (member.department) description += `${member.department}`;
+  if (member.designation) description += ` • ${member.designation}`;
+  if (member.blood_group)
+    description += ` • Blood Group: ${member.blood_group}`;
+
+  const previousImages = (await parent).openGraph?.images || [];
+  const ogImage = member.photo_url?.startsWith("http")
+    ? member.photo_url
+    : `${baseUrl}${member.photo_url || "/logo.png"}`;
+  return {
+    title: title,
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+      url: `${baseUrl}/members?id=${id}`,
+      siteName: "তীর্থ ঢাকা বিশ্ববিদ্যালয়",
+      images: [
+        {
+          url: ogImage,
+          width: 800,
+          height: 800,
+          alt: member.name,
+        },
+        ...previousImages,
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function MembersPage({
   searchParams,
