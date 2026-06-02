@@ -22,6 +22,8 @@ import {
   GraduationCap,
   Star,
   Droplet,
+  Share2,
+  Check,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -147,24 +149,25 @@ function Avatar({
 
 //           <div className="flex flex-wrap justify-center gap-2 mt-3">
 //             {designationLabel && (
-//               <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#c9a84c] text-[#0a1628]">
-//                 ⭐ {designationLabel}
+//               <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#c9a84c] text-[#0a1628]">
+//                 <Star className="w-3 h-3 fill-current" /> {designationLabel}
 //               </span>
 //             )}
 //             {member.is_alumni && (
-//               <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
-//                 🎓 {t.members.badgeAlumni}
+//               <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30">
+//                 <GraduationCap className="w-3 h-3" /> {t.members.badgeAlumni}
 //               </span>
 //             )}
 //             {member.blood_group && (
-//               <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 ring-1 ring-red-500/30">
-//                 🩸 {member.blood_group}
+//               <span className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 ring-1 ring-red-500/30">
+//                 <Droplet className="w-3 h-3 fill-current" />{" "}
+//                 {member.blood_group}
 //               </span>
 //             )}
 //           </div>
 //         </div>
 
-//         {/* Scrollable Info Body */}
+//         {/* Scrollable Info Body (Left Aligned) */}
 //         <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto">
 //           {member.department && (
 //             <InfoRow
@@ -250,6 +253,7 @@ function MemberModal({
   onClose: () => void;
 }) {
   const { t, lang } = useLanguage();
+  const [copied, setCopied] = useState(false); // শেয়ার কপি স্টেট
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -265,6 +269,46 @@ function MemberModal({
   const designationLabel = member.designation
     ? resolveDesignation(member.designation, lang)
     : null;
+
+  // শেয়ার করার ফাংশন
+  const handleShare = async () => {
+    const url = `${window.location.origin}${window.location.pathname}?id=${member.id}`;
+    const shareData = {
+      title: `${member.name} | Tirtho DU`,
+      text:
+        lang === "bn"
+          ? `তীর্থ-ঢাকা বিশ্ববিদ্যালয়ের প্রোফাইল দেখুন: ${member.name}`
+          : `Check out ${member.name}'s profile on Tirtho DU`,
+      url: url,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand("copy");
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+          console.error("Fallback copy failed", err);
+        }
+        document.body.removeChild(textArea);
+      }
+    }
+  };
 
   return (
     <div
@@ -359,26 +403,52 @@ function MemberModal({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between gap-3">
+        <div className="shrink-0 px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={onClose}
             className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 transition-colors"
           >
             {t.members.modalClose}
           </button>
-          {member.facebook_url && (
-            <a
-              href={member.facebook_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity shadow-sm"
+
+          <div className="flex gap-2">
+            {/* Share Button on Bottom */}
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-              {t.members.modalFacebookCta}
-            </a>
-          )}
+              {copied ? (
+                <Check className="w-4 h-4 text-green-500" />
+              ) : (
+                <Share2 className="w-4 h-4" />
+              )}
+              {copied
+                ? lang === "bn"
+                  ? "কপি হয়েছে!"
+                  : "Copied!"
+                : lang === "bn"
+                  ? "শেয়ার"
+                  : "Share"}
+            </button>
+
+            {member.facebook_url && (
+              <a
+                href={member.facebook_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity shadow-sm"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+                {t.members.modalFacebookCta}
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -554,11 +624,38 @@ export default function CommitteeTabs({
   totalPages: number;
   currentPage: number;
 }) {
+  const searchParams = useSearchParams();
   const [openMember, setOpenMember] = useState<CommitteeMember | null>(null);
+  // --- ১. অটোমেটিক মোডাল ওপেন করার লজিক ---
+  useEffect(() => {
+    const idParam = searchParams.get("id");
+    if (idParam && members.length > 0) {
+      const foundMember = members.find((m) => m.id.toString() === idParam);
+      if (foundMember) {
+        setOpenMember(foundMember);
+      }
+    }
+  }, [searchParams, members]);
+
+  // --- ২. মোডাল ওপেন হলে URL আপডেট ---
+  const handleOpenModal = (member: CommitteeMember) => {
+    setOpenMember(member);
+    const url = new URL(window.location.href);
+    url.searchParams.set("id", member.id.toString());
+    window.history.pushState({}, "", url.toString());
+  };
+
+  // --- ৩. মোডাল ক্লোজ হলে URL থেকে id রিমুভ ---
+  const handleCloseModal = () => {
+    setOpenMember(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("id");
+    window.history.pushState({}, "", url.toString());
+  };
+
   const { lang, t } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
   const [searchValue, setSearchValue] = useState(initialSearch);
@@ -718,7 +815,7 @@ export default function CommitteeTabs({
                   key={member.id}
                   member={member}
                   index={i}
-                  onOpen={setOpenMember}
+                  onOpen={handleOpenModal}
                 />
               ))}
             </div>
@@ -736,8 +833,12 @@ export default function CommitteeTabs({
       </section>
 
       {/* Render Modal if a member is clicked */}
-      {openMember && (
+      {/* {openMember && (
         <MemberModal member={openMember} onClose={() => setOpenMember(null)} />
+      )} */}
+
+      {openMember && (
+        <MemberModal member={openMember} onClose={handleCloseModal} />
       )}
     </>
   );

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import MembersClient, { type Member } from "./_components/MembersClient";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
+import { DESIGNATION_MAP, type DesignationKey } from "@/constants/designations";
 
 export const dynamic = "force-dynamic";
 const ITEMS_PER_PAGE = 15;
@@ -42,7 +43,20 @@ export async function generateMetadata(
   const title = `${member.name} | তীর্থ ঢাকা বিশ্ববিদ্যালয়`;
   let description = "";
   if (member.department) description += `${member.department}`;
-  if (member.designation) description += ` • ${member.designation}`;
+
+  if (member.designation) {
+    // আপনার কনস্ট্যান্ট থেকে বাংলা পদবীটি নিয়ে আসবে
+    const designationKey = member.designation as DesignationKey;
+    const prettyDesignation =
+      DESIGNATION_MAP[designationKey]?.bn ||
+      member.designation
+        .split("_")
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
+    description += ` • ${prettyDesignation}`;
+  }
+
   if (member.blood_group)
     description += ` • Blood Group: ${member.blood_group}`;
 
@@ -57,7 +71,7 @@ export async function generateMetadata(
       title: title,
       description: description,
       url: `${baseUrl}/members?id=${id}`,
-      siteName: "তীর্থ ঢাকা বিশ্ববিদ্যালয়",
+      siteName: "তীর্থ-ঢাকা বিশ্ববিদ্যালয়",
       images: [
         {
           url: ogImage,
