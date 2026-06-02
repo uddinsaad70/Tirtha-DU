@@ -161,8 +161,12 @@ function SidebarContent({
     <div className="flex flex-col h-full bg-[#0a1628]">
       <div className="px-6 py-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c9a84c] to-[#e8c96d] flex items-center justify-center text-[#0a1628] font-bold text-lg shadow-md shrink-0">
-            তী
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center p-1 shadow-md shrink-0">
+            <img
+              src="/logo.png"
+              alt="Tirtho Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-white font-bold text-base">

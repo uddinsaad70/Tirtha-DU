@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 import { formatDynamicDate } from "@/utils/formatDate";
 import Pagination from "@/components/Pagination";
+// গ্যালারি গ্রিড এখান থেকে ইম্পোর্ট করা হলো
+import GalleryGrid, { type GalleryAlbum } from "./GalleryGrid";
 import {
   Calendar,
   FileText,
@@ -17,20 +19,13 @@ import {
   Search,
   SlidersHorizontal,
   Loader2,
+  Share2,
+  Check,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export interface GalleryAlbum {
-  id: number;
-  title: string;
-  event_name: string;
-  image_urls: string[];
-  taken_at: string | null;
-  is_published: boolean;
-}
-
-interface Notice {
+export interface Notice {
   id: number;
   title: string;
   body: string | null;
@@ -40,8 +35,6 @@ interface Notice {
   created_at: string;
   category: string;
 }
-
-type TabKey = "notices" | "gallery";
 
 function daysAgo(iso: string): number {
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
@@ -53,254 +46,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Blood Donation": "bg-red-50 text-red-700",
   "Humanitarian Support": "bg-orange-50 text-orange-700",
 };
-
-// ─── Lightbox ─────────────────────────────────────────────────────────────────
-
-function Lightbox({
-  album,
-  initialIndex,
-  onClose,
-}: {
-  album: GalleryAlbum;
-  initialIndex: number;
-  onClose: () => void;
-}) {
-  const { t } = useLanguage();
-  const [current, setCurrent] = useState(initialIndex);
-  const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const images = album.image_urls;
-  const total = images.length;
-
-  const goPrev = useCallback(
-    () => setCurrent((c) => (c - 1 + total) % total),
-    [total],
-  );
-  const goNext = useCallback(() => setCurrent((c) => (c + 1) % total), [total]);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") goPrev();
-      if (e.key === "ArrowRight") goNext();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose, goPrev, goNext]);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
-
-  function onTouchStart(e: React.TouchEvent) {
-    setTouchStartX(e.touches[0].clientX);
-  }
-  function onTouchEnd(e: React.TouchEvent) {
-    if (touchStartX === null) return;
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) diff > 0 ? goNext() : goPrev();
-    setTouchStartX(null);
-  }
-
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-sm"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3 shrink-0">
-        <div className="min-w-0">
-          <p className="text-white font-semibold text-sm sm:text-base truncate">
-            {album.title}
-          </p>
-          <p className="text-gray-400 text-xs mt-0.5">
-            {album.event_name}
-            {album.taken_at && (
-              <span className="ml-2">
-                ·{" "}
-                {new Date(album.taken_at).toLocaleDateString("bn-BD", {
-                  year: "numeric",
-                  month: "long",
-                })}
-              </span>
-            )}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0 ml-4">
-          <span className="text-xs text-gray-400 font-mono tabular-nums">
-            {current + 1} / {total}
-          </span>
-          <button
-            onClick={onClose}
-            aria-label={t.news.lightboxClose}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Main image */}
-      <div
-        className="flex-1 flex items-center justify-center relative min-h-0 px-4 sm:px-16"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        {total > 1 && (
-          <button
-            onClick={goPrev}
-            aria-label={t.news.lightboxPrev}
-            className="absolute left-2 sm:left-4 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
-          >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 rotate-180" />
-          </button>
-        )}
-
-        <div className="w-full h-full flex items-center justify-center">
-          <img
-            key={current}
-            src={images[current]}
-            alt={`${album.title} — ${t.news.lightboxImageAlt} ${current + 1}`}
-            className="max-h-full max-w-full object-contain rounded-lg shadow-2xl"
-            style={{ animation: "fade-in 0.2s ease-out" }}
-          />
-        </div>
-
-        {total > 1 && (
-          <button
-            onClick={goNext}
-            aria-label={t.news.lightboxNext}
-            className="absolute right-2 sm:right-4 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
-          >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-        )}
-      </div>
-
-      {/* Thumbnail strip */}
-      {total > 1 && (
-        <div className="shrink-0 px-4 py-3 overflow-x-auto">
-          <div className="flex gap-2 justify-center min-w-max mx-auto">
-            {images.map((url, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                aria-label={`${t.news.lightboxThumbnail} ${i + 1}`}
-                className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden ring-2 transition-all duration-200 ${
-                  i === current
-                    ? "ring-[#c9a84c] opacity-100 scale-105"
-                    : "ring-transparent opacity-50 hover:opacity-80"
-                }`}
-              >
-                <img
-                  src={url}
-                  alt={`${t.news.lightboxThumbnail} ${i + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Album Card ───────────────────────────────────────────────────────────────
-
-function AlbumCard({
-  album,
-  index,
-  onOpen,
-}: {
-  album: GalleryAlbum;
-  index: number;
-  onOpen: (album: GalleryAlbum) => void;
-}) {
-  const { t, lang } = useLanguage();
-  const delay = `${Math.min(index * 0.05, 0.45)}s`;
-  const cover = album.image_urls[0];
-  const photoCount = album.image_urls.length;
-
-  return (
-    <article
-      className="animate-fade-up group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 aspect-[4/3] cursor-pointer"
-      style={{ animationDelay: delay }}
-      onClick={() => onOpen(album)}
-    >
-      <img
-        src={cover}
-        alt={album.title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-      {photoCount > 1 && (
-        <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-lg bg-black/50 backdrop-blur-sm text-white text-xs font-semibold">
-          <ImageIcon className="w-3 h-3" />
-          {photoCount}
-        </div>
-      )}
-      <div className="absolute bottom-0 inset-x-0 p-4">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-[#c9a84c] mb-1">
-          {album.event_name}
-        </p>
-        <h3 className="text-sm font-bold text-white leading-snug">
-          {album.title}
-        </h3>
-        {album.taken_at && (
-          <p className="text-xs text-white/60 mt-0.5">
-            {formatDynamicDate(album.taken_at, lang)}
-          </p>
-        )}
-        <div className="mt-2 flex items-center gap-1.5 text-[#c9a84c] text-xs font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
-          <Eye className="w-3.5 h-3.5" />
-          {t.news.albumViewCta}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-// ─── Main Grid Component ──────────────────────────────────────────────────────
-
-function GalleryGrid({
-  albums,
-  onOpenLightbox,
-}: {
-  albums: GalleryAlbum[];
-  onOpenLightbox: (album: GalleryAlbum) => void;
-}) {
-  const { t } = useLanguage();
-
-  if (albums.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <span className="text-5xl mb-4 opacity-50">📷</span>
-        <p className="text-base font-semibold text-[#0a1628]">
-          {t.news.galleryEmpty}
-        </p>
-        <p className="text-sm text-gray-400 mt-1">{t.news.galleryEmptySoon}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      {albums.map((album, i) => (
-        <AlbumCard
-          key={album.id}
-          album={album}
-          index={i}
-          onOpen={onOpenLightbox}
-        />
-      ))}
-    </div>
-  );
-}
 
 // ─── Notice Modal ─────────────────────────────────────────────────────────────
 
@@ -327,6 +72,31 @@ function NoticeModal({
       document.body.style.overflow = "";
     };
   }, []);
+
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}${window.location.pathname}?tab=notices&id=${notice.id}`;
+    const shareData = {
+      title: `${notice.title} | Tirtho DU`,
+      text:
+        lang === "bn"
+          ? `তীর্থের নোটিশটি দেখুন: ${notice.title}`
+          : `Check out this notice: ${notice.title}`,
+      url: url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {}
+    }
+  };
 
   const hasPdf = notice.file_type === "pdf" && notice.file_url;
   const hasImage = notice.file_type === "image" && notice.file_url;
@@ -408,24 +178,44 @@ function NoticeModal({
             {t.news.modalClose}
           </button>
 
-          {notice.file_url && notice.file_type !== "none" && (
-            <a
-              href={notice.file_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm"
             >
-              {notice.file_type === "pdf" ? (
-                <>
-                  <Download className="w-4 h-4" /> {t.news.modalDownloadPdf}
-                </>
+              {copied ? (
+                <Check className="w-4 h-4 text-green-500" />
               ) : (
-                <>
-                  <Eye className="w-4 h-4" /> {t.news.modalViewImage}
-                </>
+                <Share2 className="w-4 h-4" />
               )}
-            </a>
-          )}
+              {copied
+                ? lang === "bn"
+                  ? "কপি হয়েছে!"
+                  : "Copied!"
+                : lang === "bn"
+                  ? "শেয়ার"
+                  : "Share"}
+            </button>
+
+            {notice.file_url && notice.file_type !== "none" && (
+              <a
+                href={notice.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity"
+              >
+                {notice.file_type === "pdf" ? (
+                  <>
+                    <Download className="w-4 h-4" /> {t.news.modalDownloadPdf}
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4" /> {t.news.modalViewImage}
+                  </>
+                )}
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -528,8 +318,36 @@ export default function NewsTabs({
   const [isPending, startTransition] = useTransition();
 
   const [openNotice, setOpenNotice] = useState<Notice | null>(null);
-  const [lightboxAlbum, setLightboxAlbum] = useState<GalleryAlbum | null>(null);
   const [searchValue, setSearchValue] = useState(initialSearch);
+
+  useEffect(() => {
+    const idParam = searchParams.get("id");
+    const tabParam = searchParams.get("tab") || "notices";
+    if (tabParam === "notices" && idParam && initialNotices.length > 0) {
+      const foundNotice = initialNotices.find(
+        (n) => n.id.toString() === idParam,
+      );
+      if (foundNotice)
+        setOpenNotice((prev) =>
+          prev?.id === foundNotice.id ? prev : foundNotice,
+        );
+    }
+  }, [searchParams, initialNotices]);
+
+  const handleOpenNotice = (notice: Notice) => {
+    setOpenNotice(notice);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", "notices");
+    url.searchParams.set("id", notice.id.toString());
+    window.history.pushState({}, "", url.toString());
+  };
+
+  const handleCloseNotice = () => {
+    setOpenNotice(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("id");
+    window.history.pushState({}, "", url.toString());
+  };
 
   // ─── URL Update Logic ───────────
   const updateParams = (newSearch: string, newSort: string, newTab: string) => {
@@ -692,19 +510,14 @@ export default function NewsTabs({
                     key={notice.id}
                     notice={notice}
                     index={i}
-                    onOpen={setOpenNotice}
+                    onOpen={handleOpenNotice}
                   />
                 ))
               )}
             </div>
           )}
 
-          {initialTab === "gallery" && (
-            <GalleryGrid
-              albums={initialAlbums}
-              onOpenLightbox={setLightboxAlbum}
-            />
-          )}
+          {initialTab === "gallery" && <GalleryGrid albums={initialAlbums} />}
 
           {/* ─── Pagination ─── */}
           {totalPages > 1 && (
@@ -718,15 +531,7 @@ export default function NewsTabs({
       </section>
 
       {openNotice && (
-        <NoticeModal notice={openNotice} onClose={() => setOpenNotice(null)} />
-      )}
-
-      {lightboxAlbum && (
-        <Lightbox
-          album={lightboxAlbum}
-          initialIndex={0}
-          onClose={() => setLightboxAlbum(null)}
-        />
+        <NoticeModal notice={openNotice} onClose={handleCloseNotice} />
       )}
     </>
   );

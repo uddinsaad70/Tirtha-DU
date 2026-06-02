@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { formatDynamicDate } from "@/utils/formatDate";
+import { Eye, Share2, Check, Image as ImageIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -31,6 +33,22 @@ function Lightbox({
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const images = album.image_urls;
   const total = images.length;
+
+  const [copied, setCopied] = useState(false);
+
+  // শেয়ার ফাংশন
+  const handleShare = async () => {
+    const url = `${window.location.origin}${window.location.pathname}?tab=gallery&id=${album.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: album.title, url: url });
+      } catch (err) {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const goPrev = useCallback(
     () => setCurrent((c) => (c - 1 + total) % total),
@@ -96,6 +114,16 @@ function Lightbox({
           {/* Counter — e.g. "3 / 12" — numeric, no translation needed */}
           <span className="text-xs text-gray-400 font-mono tabular-nums">
             {current + 1} / {total}
+            <button
+              onClick={handleShare}
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            >
+              {copied ? (
+                <Check className="w-4 h-4 text-green-400" />
+              ) : (
+                <Share2 className="w-4 h-4" />
+              )}
+            </button>
           </span>
           <button
             onClick={onClose}
@@ -315,6 +343,33 @@ export default function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
   const { t } = useLanguage();
   const [lightboxAlbum, setLightboxAlbum] = useState<GalleryAlbum | null>(null);
 
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const idParam = searchParams.get("id");
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "gallery" && idParam && albums.length > 0) {
+      const found = albums.find((a) => a.id.toString() === idParam);
+      if (found)
+        setLightboxAlbum((prev) => (prev?.id === found.id ? prev : found));
+    }
+  }, [searchParams, albums]);
+
+  const handleOpenAlbum = (album: GalleryAlbum) => {
+    setLightboxAlbum(album);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", "gallery");
+    url.searchParams.set("id", album.id.toString());
+    window.history.pushState({}, "", url.toString());
+  };
+
+  const handleCloseAlbum = () => {
+    setLightboxAlbum(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("id");
+    window.history.pushState({}, "", url.toString());
+  };
+
   if (albums.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center">
@@ -335,7 +390,7 @@ export default function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
             key={album.id}
             album={album}
             index={i}
-            onOpen={setLightboxAlbum}
+            onOpen={handleOpenAlbum}
           />
         ))}
       </div>
@@ -344,7 +399,7 @@ export default function GalleryGrid({ albums }: { albums: GalleryAlbum[] }) {
         <Lightbox
           album={lightboxAlbum}
           initialIndex={0}
-          onClose={() => setLightboxAlbum(null)}
+          onClose={handleCloseAlbum}
         />
       )}
     </>

@@ -19,6 +19,8 @@ import {
   X,
   Download,
   Eye,
+  Share2,
+  Check,
 } from "lucide-react";
 import { siteConfig } from "@/config/siteConfig";
 
@@ -63,6 +65,32 @@ function NoticeModal({
       document.body.style.overflow = "";
     };
   }, []);
+
+  const [copied, setCopied] = useState(false);
+
+  // 👇 শেয়ার লজিক (সরাসরি News পেজের লিংক তৈরি করবে) 👇
+  const handleShare = async () => {
+    const url = `${window.location.origin}/news?tab=notices&id=${notice.id}`;
+    const shareData = {
+      title: `${notice.title} | Tirtho DU`,
+      text:
+        lang === "bn"
+          ? `তীর্থের নোটিশটি দেখুন: ${notice.title}`
+          : `Check out this notice: ${notice.title}`,
+      url: url,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {}
+    }
+  };
 
   const hasPdf = notice.file_type === "pdf" && notice.file_url;
   const hasImage = notice.file_type === "image" && notice.file_url;
@@ -146,24 +174,44 @@ function NoticeModal({
             {t.news.modalClose}
           </button>
 
-          {notice.file_url && notice.file_type !== "none" && (
-            <a
-              href={notice.file_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm"
             >
-              {notice.file_type === "pdf" ? (
-                <>
-                  <Download className="w-4 h-4" /> {t.news.modalDownloadPdf}
-                </>
+              {copied ? (
+                <Check className="w-4 h-4 text-green-500" />
               ) : (
-                <>
-                  <Eye className="w-4 h-4" /> {t.news.modalViewImage}
-                </>
+                <Share2 className="w-4 h-4" />
               )}
-            </a>
-          )}
+              {copied
+                ? lang === "bn"
+                  ? "কপি হয়েছে!"
+                  : "Copied!"
+                : lang === "bn"
+                  ? "শেয়ার"
+                  : "Share"}
+            </button>
+
+            {notice.file_url && notice.file_type !== "none" && (
+              <a
+                href={notice.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-[#0a1628] bg-gradient-to-r from-[#c9a84c] to-[#e8c96d] hover:opacity-90 transition-opacity"
+              >
+                {notice.file_type === "pdf" ? (
+                  <>
+                    <Download className="w-4 h-4" /> {t.news.modalDownloadPdf}
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4" /> {t.news.modalViewImage}
+                  </>
+                )}
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -214,72 +262,104 @@ function NoticeCard({
         ? "animation-delay-200"
         : "animation-delay-300";
 
+  const hasImage = notice.file_type === "image" && notice.file_url;
+
   return (
     <article
       onClick={() => onOpen(notice)}
-      className={`animate-fade-up ${delayClass} bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer group flex flex-col`}
+      className={`animate-fade-up ${delayClass} bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer group flex flex-col h-full`}
     >
-      <div className="h-0.5 bg-gradient-to-r from-[#c9a84c]/40 to-[#e8c96d]/40 group-hover:from-[#c9a84c] group-hover:to-[#e8c96d] transition-all duration-300" />
-      <div className="p-5 sm:p-6 flex items-start gap-4 flex-1">
-        <div className="shrink-0 w-12 h-12 rounded-xl bg-[#0a1628] flex items-center justify-center text-white/80 group-hover:text-white transition-colors">
-          {notice.file_type === "pdf" ? (
-            <FileText className="w-5 h-5" />
-          ) : notice.file_type === "image" ? (
-            <ImageIcon className="w-5 h-5" />
-          ) : (
-            <Bell className="w-5 h-5" />
-          )}
+      <div className="h-0.5 bg-gradient-to-r from-[#c9a84c]/40 to-[#e8c96d]/40 group-hover:from-[#c9a84c] group-hover:to-[#e8c96d] transition-all duration-300 z-10 relative" />
+
+      {/* ─── Top Cover Area (Image or Placeholder) ─── */}
+      <div className="relative h-48 w-full shrink-0 overflow-hidden border-b border-gray-100 bg-gray-50">
+        {hasImage ? (
+          <>
+            {/* যদি ছবি থাকে */}
+            <img
+              src={notice.file_url!}
+              alt={notice.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+          </>
+        ) : (
+          <>
+            {/* যদি ছবি না থাকে (Fallback Cover) */}
+            <div className="w-full h-full bg-gradient-to-br from-[#0a1628] to-[#1a2f4e] flex items-center justify-center relative overflow-hidden">
+              {/* ব্যাকগ্রাউন্ড প্যাটার্ন */}
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
+                  backgroundSize: "16px 16px",
+                }}
+              />
+              {/* আইকন */}
+              {notice.file_type === "pdf" ? (
+                <FileText
+                  className="w-14 h-14 text-[#c9a84c] opacity-80 group-hover:scale-110 transition-transform duration-500 relative z-10"
+                  strokeWidth={1.5}
+                />
+              ) : (
+                <Bell
+                  className="w-14 h-14 text-[#c9a84c] opacity-80 group-hover:scale-110 transition-transform duration-500 relative z-10"
+                  strokeWidth={1.5}
+                />
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* ─── Content Area ─── */}
+      <div className="p-5 sm:p-6 flex flex-col flex-1">
+        <div className="flex flex-wrap items-center gap-2 mb-2.5">
+          <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+            {t.home.noticesSuperLabel}
+          </span>
+          <time className="text-xs text-gray-400">
+            {formatDynamicDate(notice.published_at || notice.created_at, lang)}
+          </time>
         </div>
 
-        <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
-              {t.home.noticesSuperLabel}
-            </span>
-            <time className="text-xs text-gray-400">
-              {formatDynamicDate(
-                notice.published_at || notice.created_at,
-                lang,
+        <h3 className="text-base font-semibold text-[#0a1628] leading-snug mb-2 group-hover:text-[#c9a84c] transition-colors line-clamp-2">
+          {notice.title}
+        </h3>
+
+        {notice.body && (
+          <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-4">
+            {notice.body}
+          </p>
+        )}
+
+        {/* ─── Footer Section ─── */}
+        <div className="mt-auto flex items-center justify-between border-t border-gray-50 pt-3">
+          <span className="text-xs font-semibold text-gray-400 group-hover:text-[#c9a84c] transition-colors flex items-center gap-1">
+            {t.common.readmore}{" "}
+            <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+          </span>
+
+          {notice.file_url && (
+            <a
+              href={notice.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs font-semibold text-[#c9a84c] hover:text-[#0a1628] transition-colors inline-flex items-center gap-1 bg-[#c9a84c]/10 px-2.5 py-1 rounded-md"
+            >
+              {notice.file_type === "pdf" ? (
+                <>
+                  <FileText className="w-3 h-3" /> PDF
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="w-3 h-3" /> Image
+                </>
               )}
-            </time>
-          </div>
-
-          <h3 className="text-base font-semibold text-[#0a1628] leading-snug mb-2 group-hover:text-[#c9a84c] transition-colors line-clamp-2">
-            {notice.title}
-          </h3>
-
-          {notice.body && (
-            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 mb-4">
-              {notice.body}
-            </p>
+            </a>
           )}
-
-          <div className="mt-auto flex items-center justify-between border-t border-gray-50 pt-3">
-            <span className="text-xs font-semibold text-gray-400 group-hover:text-[#c9a84c] transition-colors flex items-center gap-1">
-              {t.common.readmore}{" "}
-              <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-            </span>
-
-            {notice.file_url && (
-              <a
-                href={notice.file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="text-xs font-semibold text-[#c9a84c] hover:text-[#0a1628] transition-colors inline-flex items-center gap-1 bg-[#c9a84c]/10 px-2.5 py-1 rounded-md"
-              >
-                {notice.file_type === "pdf" ? (
-                  <>
-                    <FileText className="w-3 h-3" /> PDF
-                  </>
-                ) : (
-                  <>
-                    <ImageIcon className="w-3 h-3" /> Image
-                  </>
-                )}
-              </a>
-            )}
-          </div>
         </div>
       </div>
     </article>
